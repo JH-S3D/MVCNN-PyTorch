@@ -21,15 +21,25 @@ class MultiViewDataSet(Dataset):
         self.transform = transform
         self.target_transform = target_transform
 
-        # root / <label>  / <train/test> / <item> / <view>.png
-        for label in os.listdir(root): # Label
-            for item in os.listdir(root + '/' + label + '/' + data_type):
-                views = []
-                for view in os.listdir(root + '/' + label + '/' + data_type + '/' + item):
-                    views.append(root + '/' + label + '/' + data_type + '/' + item + '/' + view)
-
-                self.x.append(views)
-                self.y.append(self.class_to_idx[label])
+        # root / <label> / <train/test> / <item>_<view>.png
+        for label in os.listdir(root):  # Label
+            label_path = os.path.join(root, label, data_type)
+            if os.path.isdir(label_path):  # Checking if the path is valid
+                items_views = {}
+                for file in os.listdir(label_path):
+                    if file.endswith(".png"):  # Ensure it's an image file
+                        item_view = file.split('_')  # Split filename into item and view
+                        item = '_'.join(item_view[:-1])  # Item name (handle cases where item name might contain '_')
+                        view = item_view[-1]  # View (e.g., "1.png")
+                        
+                        if item not in items_views:
+                            items_views[item] = []
+                        items_views[item].append(os.path.join(label_path, file))
+                
+                # Now append the collected views and labels into the lists
+                for item, views in items_views.items():
+                    self.x.append(views)
+                    self.y.append(self.class_to_idx[label])
 
     # Override to give PyTorch access to any image on the dataset
     def __getitem__(self, index):
