@@ -33,6 +33,6 @@ class Logger(object):
 
     def histo_summary(self, tag, values, step, bins=1000):
         """Log a histogram of the tensor of values."""
-        with self.writer.as_default():
-            tf.summary.histogram(tag, values, buckets=bins, step=step)
-            self.writer.flush()
+        #with self.writer.as_default():
+        #    tf.summary.histogram(tag, values, buckets=bins, step=step)
+        #    self.writer.flush()
