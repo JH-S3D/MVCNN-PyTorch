@@ -83,7 +83,7 @@ def main():
     dataloaders = {x: DataLoader(image_datasets[x], batch_size=4, shuffle=True, num_workers=4)
                    for x in ['train', 'test']}
 
-    model = MVCNN(pretrained=False)
+    model = mvcnn(pretrained=False)
     train_model(model, dataloaders, num_epochs=50, device='cuda')
 
 if __name__ == '__main__':
