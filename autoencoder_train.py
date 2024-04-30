@@ -33,8 +33,9 @@ def train_model(model, dataloaders, device='cuda', num_epochs=25):
 
             # Iterate over data.
             for inputs, labels in dataloaders[phase]:
-                inputs = inputs.to(device)
-                labels = labels.to(device)
+                inputs = torch.stack(inputs)  # This converts a list of tensors to a single tensor
+                inputs = inputs.to(device)  # Now you can transfer it to the device safely
+                #labels = labels.to(device)
 
                 # Zero the parameter gradients
                 optimizer.zero_grad()
@@ -42,7 +43,7 @@ def train_model(model, dataloaders, device='cuda', num_epochs=25):
                 # Forward
                 with torch.set_grad_enabled(phase == 'train'):
                     outputs, _ = model(inputs)  # Adjust based on your model's output
-                    loss = mse_loss(outputs, labels)
+                    loss = mse_loss(outputs, inputs)
 
                     # Backward + optimize only if in training phase
                     if phase == 'train':
