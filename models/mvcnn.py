@@ -63,14 +63,27 @@ class MVCNN(nn.Module):
         )
 
     def forward(self, x):
-        x = self.encoder(x)
-        embedding = self.fc_encoder(x)  # This is your embedding_size-length embedding
-        embedding = self.sigmoid(embedding)
+        batch_size, num_views, c, h, w = x.size()
+        x = x.view(batch_size * num_views, c, h, w)  # Reshape to combine batch and views
 
-        x = self.fc_decoder(embedding)
-        x = x.view(-1, 256, 6, 6)  # Reshape back to the spatial dimensions expected by the first decoder layer
+        # Encode views
+        x = self.encoder(x)
+        x = x.view(x.size(0), -1)
+        embeddings = self.fc_encoder(x)
+        embeddings = self.sigmoid(embeddings)
+
+        # Decode views
+        x = self.fc_decoder(embeddings)
+        x = x.view(-1, 256, 6, 6)
         x = self.decoder(x)
-        return x, embedding  # Optionally return the embedding
+
+        # Reshape back to separate views
+        x = x.view(batch_size, num_views, 3, 224, 224)  # Assuming output shape matches input
+
+        # Pooling across views (example: max pooling)
+        output, _ = torch.max(x, 1)
+
+        return output, embeddings
 
 
 def mvcnn(pretrained=False, **kwargs):
