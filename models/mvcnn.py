@@ -13,15 +13,18 @@ model_urls = {
 
 class MVCNN(nn.Module):
 
-    def __init__(self, num_classes=1000):
+    def __init__(self, embedding_size=4096):
         super(MVCNN, self).__init__()
-        self.features = nn.Sequential(
+        # Encoder
+        self.encoder = nn.Sequential(
             nn.Conv2d(3, 64, kernel_size=11, stride=4, padding=2),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=3, stride=2),
+
             nn.Conv2d(64, 192, kernel_size=5, padding=2),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=3, stride=2),
+
             nn.Conv2d(192, 384, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
             nn.Conv2d(384, 256, kernel_size=3, padding=1),
@@ -29,34 +32,36 @@ class MVCNN(nn.Module):
             nn.Conv2d(256, 256, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=3, stride=2),
+            nn.Flatten()
         )
-        self.classifier = nn.Sequential(
-            nn.Dropout(),
-            nn.Linear(256 * 6 * 6, 4096),
+        # Embedding layer to adjust to exactly embedding_size dimensions if needed
+        self.fc_encoder = nn.Linear(256 * 6 * 6, embedding_size)
+
+        self.sigmoid = nn.Sigmoid()
+
+        # Decoder
+        self.fc_decoder = nn.Linear(embedding_size, 256 * 6 * 6)
+        self.decoder = nn.Sequential(
+            nn.ConvTranspose2d(256, 256, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
-            nn.Dropout(),
-            nn.Linear(4096, 4096),
+            nn.ConvTranspose2d(256, 384, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
-            nn.Linear(4096, num_classes),
+            nn.ConvTranspose2d(384, 192, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.ConvTranspose2d(192, 64, kernel_size=5, padding=2),
+            nn.ReLU(inplace=True),
+            nn.ConvTranspose2d(64, 3, kernel_size=11, stride=4, padding=2)
         )
 
     def forward(self, x):
-        x = x.transpose(0, 1)
-        
-        view_pool = []
-        
-        for v in x:
-            v = self.features(v)
-            v = v.view(v.size(0), 256 * 6 * 6)
-            
-            view_pool.append(v)
-        
-        pooled_view = view_pool[0]
-        for i in range(1, len(view_pool)):
-            pooled_view = torch.max(pooled_view, view_pool[i])
-        
-        pooled_view = self.classifier(pooled_view)
-        return pooled_view
+        x = self.encoder(x)
+        embedding = self.fc_encoder(x)  # This is your embedding_size-length embedding
+        embedding = self.sigmoid(embedding)
+
+        x = self.fc_decoder(embedding)
+        x = x.view(-1, 256, 6, 6)  # Reshape back to the spatial dimensions expected by the first decoder layer
+        x = self.decoder(x)
+        return x, embedding  # Optionally return the embedding
 
 
 def mvcnn(pretrained=False, **kwargs):
