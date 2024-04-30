@@ -16,6 +16,7 @@ mse_loss = nn.MSELoss()
 def train_model(model, dataloaders, device='cuda', num_epochs=25):
     model.to(device)
     optimizer = optim.Adam(model.parameters(), lr=0.001)  # Using Adam optimizer
+    best_loss = float('inf')  # Initialize the best loss to infinity
 
     for epoch in range(num_epochs):
         print('Epoch {}/{}'.format(epoch + 1, num_epochs))
@@ -54,6 +55,12 @@ def train_model(model, dataloaders, device='cuda', num_epochs=25):
             epoch_loss = running_loss / len(dataloaders[phase].dataset)
             print('{} Loss: {:.4f}'.format(phase, epoch_loss))
 
+            # Check if this is the best loss so far; save model if this is the case
+            if phase == 'val' and epoch_loss < best_loss:
+                best_loss = epoch_loss
+                print(f"New best loss {best_loss:.4f} at epoch {epoch+1}. Saving model...")
+                torch.save(model.state_dict(), f'model_{epoch + 1}.pth')
+
 def main():
     # Data augmentation and normalization for training
     # Just normalization for validation
@@ -77,7 +84,7 @@ def main():
                    for x in ['train', 'test']}
 
     model = MVCNN(pretrained=False)
-    train_model(model, dataloaders, num_epochs=25, device='cuda')
+    train_model(model, dataloaders, num_epochs=50, device='cuda')
 
 if __name__ == '__main__':
     main()
