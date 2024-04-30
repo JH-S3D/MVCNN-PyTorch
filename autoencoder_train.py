@@ -70,7 +70,7 @@ def main():
             transforms.CenterCrop(224),
             transforms.ToTensor(),
         ]),
-        'val': transforms.Compose([
+        'test': transforms.Compose([
             transforms.Resize(256),
             transforms.CenterCrop(224),
             transforms.ToTensor(),
