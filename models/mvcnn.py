@@ -42,7 +42,7 @@ class MVCNN(nn.Module):
         # Decoder
         self.fc_decoder = nn.Linear(embedding_size, 256 * 6 * 6)
         self.decoder = nn.Sequential(
-            nn.MaxUnpool2d(kernel_size=3, stride=2),
+            #nn.MaxUnpool2d(kernel_size=3, stride=2),
             nn.ConvTranspose2d(256, 256, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
 
