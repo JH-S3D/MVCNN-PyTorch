@@ -37,6 +37,7 @@ def train_model(model, dataloaders, device='cuda', num_epochs=25):
             # Iterate over data.
             for inputs, labels in dataloaders[phase]:
                 inputs = np.stack(inputs, axis=1)
+                inputs = inputs[0]
 
                 inputs = torch.from_numpy(inputs)
 
@@ -49,7 +50,7 @@ def train_model(model, dataloaders, device='cuda', num_epochs=25):
 
                 # Forward
                 with torch.set_grad_enabled(phase == 'train'):
-                    outputs, _ = model(inputs[0])  # Adjust based on your model's output
+                    outputs, _ = model(inputs)  # Adjust based on your model's output
                     loss = mse_loss(outputs, inputs)
 
                     # Backward + optimize only if in training phase
