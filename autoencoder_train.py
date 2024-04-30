@@ -70,7 +70,7 @@ def main():
         ]),
     }
 
-    data_dir = 'path_to_data'
+    data_dir = '/home/user/repo/modelnet40_images_new_12x'
     image_datasets = {x: MultiViewDataSet(os.path.join(data_dir, x), data_type=x, transform=data_transforms[x])
                       for x in ['train', 'val']}
     dataloaders = {x: DataLoader(image_datasets[x], batch_size=4, shuffle=True, num_workers=4)
