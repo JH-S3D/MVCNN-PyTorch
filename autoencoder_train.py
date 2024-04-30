@@ -38,10 +38,10 @@ def train_model(model, dataloaders, device='cuda', num_epochs=25):
             for inputs, labels in dataloaders[phase]:
                 inputs = np.stack(inputs, axis=1)
                 inputs = inputs[0]
-                print("Inputs: ", type(inputs))
-                print("Inputs: ", inputs.size())
 
                 inputs = torch.from_numpy(inputs)
+                print("Inputs: ", type(inputs))
+                print("Inputs: ", inputs.size())
 
                 inputs = inputs.cuda(device)
                 inputs = Variable(inputs)
