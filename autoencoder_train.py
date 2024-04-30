@@ -4,7 +4,10 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 import torchvision.transforms as transforms
 from torchvision.transforms.functional import to_tensor
+from torch.autograd import Variable
 
+import numpy as np
+import time
 import os
 
 # Assuming MVCNN and MultiViewDataSet are defined in the imported module
@@ -33,8 +36,12 @@ def train_model(model, dataloaders, device='cuda', num_epochs=25):
 
             # Iterate over data.
             for inputs, labels in dataloaders[phase]:
-                inputs = torch.stack(inputs)  # This converts a list of tensors to a single tensor
-                inputs = inputs.to(device)  # Now you can transfer it to the device safely
+                inputs = np.stack(inputs, axis=1)
+
+                inputs = torch.from_numpy(inputs)
+
+                inputs = inputs.cuda(device)
+                inputs = Variable(inputs)
                 #labels = labels.to(device)
 
                 # Zero the parameter gradients
