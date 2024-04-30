@@ -81,7 +81,7 @@ def main():
     data_dir = '/home/user/repo/modelnet40_images_new_12x'
     image_datasets = {x: MultiViewDataSet(root=data_dir, data_type=x, transform=data_transforms[x])
                       for x in ['train', 'test']}
-    dataloaders = {x: DataLoader(image_datasets[x], batch_size=4, shuffle=True, num_workers=4)
+    dataloaders = {x: DataLoader(image_datasets[x], shuffle=True, num_workers=4)
                    for x in ['train', 'test']}
 
     model = mvcnn(pretrained=False)
