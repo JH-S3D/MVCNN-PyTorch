@@ -127,6 +127,8 @@ def train():
         inputs, targets = inputs.cuda(device), targets.cuda(device)
         inputs, targets = Variable(inputs), Variable(targets)
 
+        print("Inputs: ", type(inputs))
+        print("Inputs: ", inputs.size())
         # compute output
         outputs = model(inputs)
         loss = criterion(outputs, targets)
