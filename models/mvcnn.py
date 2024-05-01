@@ -63,8 +63,8 @@ class MVCNN(nn.Module):
         )
 
     def forward(self, x):
-        batch_size, num_views, c, h, w = x.size()
-        x = x.view(batch_size * num_views, c, h, w)  # Reshape to combine batch and views
+        #batch_size, num_views, c, h, w = x.size()
+        #x = x.view(batch_size * num_views, c, h, w)  # Reshape to combine batch and views
 
         # Encode views
         x = self.encoder(x)
@@ -78,7 +78,7 @@ class MVCNN(nn.Module):
         x = self.decoder(x)
 
         # Reshape back to separate views
-        x = x.view(batch_size, num_views, 3, 224, 224)  # Assuming output shape matches input
+        x = x.view(12, 3, 224, 224)  # Assuming output shape matches input
 
         # Pooling across views (example: max pooling)
         output, _ = torch.max(x, 1)

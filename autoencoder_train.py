@@ -37,7 +37,7 @@ def train_model(model, dataloaders, device='cuda', num_epochs=25):
             # Iterate over data.
             for inputs, labels in dataloaders[phase]:
                 inputs = np.stack(inputs, axis=1)
-                #inputs = inputs[0]
+                inputs = inputs[0]
 
                 inputs = torch.from_numpy(inputs)
 
@@ -92,7 +92,7 @@ def main():
     data_dir = '/home/user/repo/modelnet40_images_new_12x'
     image_datasets = {x: MultiViewDataSet(root=data_dir, data_type=x, transform=data_transforms[x])
                       for x in ['train', 'test']}
-    dataloaders = {x: DataLoader(image_datasets[x], shuffle=True, batch_size=4, num_workers=4)
+    dataloaders = {x: DataLoader(image_datasets[x], shuffle=True, batch_size=1, num_workers=4)
                    for x in ['train', 'test']}
 
     model = mvcnn(pretrained=False)
