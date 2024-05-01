@@ -40,12 +40,13 @@ def train_model(model, dataloaders, device='cuda', num_epochs=25):
                 #inputs = inputs[0]
 
                 inputs = torch.from_numpy(inputs)
-                print("Inputs: ", type(inputs))
-                print("Inputs: ", inputs.size())
 
-                #inputs = inputs.cuda(device)
+                inputs = inputs.cuda(device)
                 #inputs = Variable(inputs)
                 #labels = labels.to(device)
+
+                print("Inputs: ", type(inputs))
+                print("Inputs: ", inputs.size())
 
                 # Zero the parameter gradients
                 optimizer.zero_grad()
