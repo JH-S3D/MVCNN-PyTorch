@@ -36,7 +36,7 @@ def train_model(model, dataloaders, device='cuda', num_epochs=25):
 
             # Iterate over data.
             for inputs, labels in dataloaders[phase]:
-                print("Before Stack: ", inputs.shape)
+                print("Before Stack: ", inputs)
                 inputs = np.stack(inputs, axis=1)
                 print("After Stack: ", inputs.shape)
                 inputs = inputs[0]
