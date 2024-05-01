@@ -36,14 +36,15 @@ def train_model(model, dataloaders, device='cuda', num_epochs=25):
 
             # Iterate over data.
             for inputs, labels in dataloaders[phase]:
+                print("Before Stack: ", inputs.shape)
                 inputs = np.stack(inputs, axis=1)
+                print("After Stack: ", inputs.shape)
                 inputs = inputs[0]
+                print("After first index: ", inputs.shape)
 
                 inputs = torch.from_numpy(inputs)
 
                 inputs = inputs.cuda(device)
-                #inputs = Variable(inputs)
-                #labels = labels.to(device)
 
                 # Zero the parameter gradients
                 optimizer.zero_grad()
