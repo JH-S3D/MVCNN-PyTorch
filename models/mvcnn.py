@@ -42,24 +42,22 @@ class MVCNN(nn.Module):
         # Decoder
         self.fc_decoder = nn.Linear(embedding_size, 256 * 6 * 6)
         self.decoder = nn.Sequential(
-            #nn.MaxUnpool2d(kernel_size=3, stride=2),
-            nn.ConvTranspose2d(256, 256, kernel_size=3, padding=1),
-            nn.ReLU(inplace=True),
-
-            #nn.MaxUnpool2d(kernel_size=3, stride=2),
+            nn.MaxUnpool2d(kernel_size=3, stride=2),
             nn.ConvTranspose2d(256, 384, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
 
-            #nn.MaxUnpool2d(kernel_size=3, stride=2),
-            nn.ConvTranspose2d(384, 192, kernel_size=3, padding=1),
+            nn.ConvTranspose2d(384, 256, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.ConvTranspose2d(256, 192, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
 
-            #nn.MaxUnpool2d(kernel_size=3, stride=2),
+            nn.MaxUnpool2d(kernel_size=3, stride=2),
             nn.ConvTranspose2d(192, 64, kernel_size=5, padding=2),
             nn.ReLU(inplace=True),
 
-            #nn.MaxUnpool2d(kernel_size=3, stride=2),
-            nn.ConvTranspose2d(64, 3, kernel_size=11, stride=4, padding=2)
+            nn.MaxUnpool2d(kernel_size=3, stride=2),
+            nn.ConvTranspose2d(64, 3, kernel_size=11, stride=4, padding=2, output_padding=1),
+            nn.ReLU(inplace=True)
         )
 
     def forward(self, x):
