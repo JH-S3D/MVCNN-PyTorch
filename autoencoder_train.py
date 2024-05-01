@@ -26,7 +26,7 @@ def train_model(model, dataloaders, device='cuda', num_epochs=25):
         print('-' * 10)
 
         # Each epoch has a training and validation phase
-        for phase in ['train', 'val']:
+        for phase in ['train', 'test']:
             if phase == 'train':
                 model.train()  # Set model to training mode
             else:
@@ -65,7 +65,7 @@ def train_model(model, dataloaders, device='cuda', num_epochs=25):
             print('{} Loss: {:.4f}'.format(phase, epoch_loss))
 
             # Check if this is the best loss so far; save model if this is the case
-            if phase == 'val' and epoch_loss < best_loss:
+            if phase == 'test' and epoch_loss < best_loss:
                 best_loss = epoch_loss
                 print(f"New best loss {best_loss:.4f} at epoch {epoch+1}. Saving model...")
                 torch.save(model.state_dict(), f'model_{epoch + 1}.pth')
