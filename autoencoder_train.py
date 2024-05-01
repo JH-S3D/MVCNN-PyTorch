@@ -57,7 +57,7 @@ def train_model(model, dataloaders, device='cuda', num_epochs=25):
                         optimizer.step()
 
                 # Statistics
-                running_loss += loss.item() * inputs.size(0)
+                running_loss += loss.item()# * inputs.size(0)
 
             epoch_loss = running_loss / len(dataloaders[phase].dataset)
             print('{} Loss: {:.4f}'.format(phase, epoch_loss))
