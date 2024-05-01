@@ -43,8 +43,8 @@ def train_model(model, dataloaders, device='cuda', num_epochs=25):
                 print("Inputs: ", type(inputs))
                 print("Inputs: ", inputs.size())
 
-                inputs = inputs.cuda(device)
-                inputs = Variable(inputs)
+                #inputs = inputs.cuda(device)
+                #inputs = Variable(inputs)
                 #labels = labels.to(device)
 
                 # Zero the parameter gradients
