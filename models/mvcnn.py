@@ -78,6 +78,7 @@ class MVCNN(nn.Module):
         x = self.decoder(x)
 
         # Reshape back to separate views
+        print(x.size())
         x = x.view(12, 3, 224, 224)  # Assuming output shape matches input
 
         # Pooling across views (example: max pooling)
