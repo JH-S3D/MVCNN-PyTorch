@@ -45,9 +45,6 @@ def train_model(model, dataloaders, device='cuda', num_epochs=25):
                 #inputs = Variable(inputs)
                 #labels = labels.to(device)
 
-                print("Inputs: ", type(inputs))
-                print("Inputs: ", inputs.size())
-
                 # Zero the parameter gradients
                 optimizer.zero_grad()
 
