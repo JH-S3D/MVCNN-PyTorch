@@ -43,15 +43,15 @@ class MVCNN(nn.Module):
         self.fc_decoder = nn.Linear(embedding_size, 256 * 6 * 6)
         self.decoder = nn.Sequential(
             # Upsampling + Convolution to progressively restore dimensions
-            nn.Upsample(scale_factor=1),  # Increase size
+            nn.Upsample(scale_factor=2),  # Increase size
             nn.Conv2d(256, 256, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
 
-            nn.Upsample(scale_factor=1),  # Further increase size
+            nn.Upsample(scale_factor=2),  # Further increase size
             nn.Conv2d(256, 192, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
 
-            nn.Upsample(scale_factor=1),  # Further increase size
+            nn.Upsample(scale_factor=2),  # Further increase size
             nn.Conv2d(192, 64, kernel_size=5, padding=2),
             nn.ReLU(inplace=True),
             
