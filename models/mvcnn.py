@@ -12,70 +12,78 @@ model_urls = {
 
 
 class MVCNN(nn.Module):
+
     def __init__(self, embedding_size=4096):
         super(MVCNN, self).__init__()
-        # Define encoder layers but do not encapsulate in nn.Sequential
-        # if needing to capture output for indices
-        self.conv1 = nn.Conv2d(3, 64, kernel_size=11, stride=4, padding=2)
-        self.pool1 = nn.MaxPool2d(kernel_size=3, stride=2, return_indices=True)
-        self.conv2 = nn.Conv2d(64, 192, kernel_size=5, padding=2)
-        self.pool2 = nn.MaxPool2d(kernel_size=3, stride=2, return_indices=True)
-        self.conv3 = nn.Conv2d(192, 384, kernel_size=3, padding=1)
-        self.conv4 = nn.Conv2d(384, 256, kernel_size=3, padding=1)
-        self.conv5 = nn.Conv2d(256, 256, kernel_size=3, padding=1)
-        self.pool3 = nn.MaxPool2d(kernel_size=3, stride=2, return_indices=True)
-        self.flatten = nn.Flatten()
+        # Encoder
+        self.encoder = nn.Sequential(
+            nn.Conv2d(3, 64, kernel_size=11, stride=4, padding=2),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=3, stride=2),
+
+            nn.Conv2d(64, 192, kernel_size=5, padding=2),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=3, stride=2),
+
+            nn.Conv2d(192, 384, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(384, 256, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(256, 256, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=3, stride=2),
+            nn.Flatten()
+        )
+        # Embedding layer to adjust to exactly embedding_size dimensions if needed
         self.fc_encoder = nn.Linear(256 * 6 * 6, embedding_size)
+
         self.sigmoid = nn.Sigmoid()
 
-        # Define decoder
+        # Decoder
         self.fc_decoder = nn.Linear(embedding_size, 256 * 6 * 6)
-        self.unpool3 = nn.MaxUnpool2d(kernel_size=3, stride=2)
-        self.deconv5 = nn.ConvTranspose2d(256, 256, kernel_size=3, padding=1)
-        self.deconv4 = nn.ConvTranspose2d(256, 384, kernel_size=3, padding=1)
-        self.deconv3 = nn.ConvTranspose2d(384, 192, kernel_size=3, padding=1)
-        self.unpool2 = nn.MaxUnpool2d(kernel_size=3, stride=2)
-        self.deconv2 = nn.ConvTranspose2d(192, 64, kernel_size=5, padding=2)
-        self.unpool1 = nn.MaxUnpool2d(kernel_size=3, stride=2)
-        self.deconv1 = nn.ConvTranspose2d(64, 3, kernel_size=11, stride=4, padding=2, output_padding=1)
+        self.decoder = nn.Sequential(
+            nn.Upsample(scale_factor=1, mode='nearest'),
+            nn.ConvTranspose2d(256, 384, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+
+            nn.ConvTranspose2d(384, 256, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.ConvTranspose2d(256, 192, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+
+            nn.Upsample(scale_factor=1, mode='nearest'),
+            nn.ConvTranspose2d(192, 64, kernel_size=5, padding=2),
+            nn.ReLU(inplace=True),
+
+            nn.Upsample(scale_factor=1, mode='nearest'),
+            nn.ConvTranspose2d(64, 3, kernel_size=11, stride=4, padding=2, output_padding=1),
+            nn.ReLU(inplace=True)
+        )
 
     def forward(self, x):
-        # Encoding
-        x = self.conv1(x)
-        x = nn.ReLU()(x)
-        x, indices1 = self.pool1(x)
-        x = self.conv2(x)
-        x = nn.ReLU()(x)
-        x, indices2 = self.pool2(x)
-        x = self.conv3(x)
-        x = nn.ReLU()(x)
-        x = self.conv4(x)
-        x = nn.ReLU()(x)
-        x = self.conv5(x)
-        x = nn.ReLU()(x)
-        x, indices3 = self.pool3(x)
-        x = self.flatten(x)
-        x = self.fc_encoder(x)
-        embeddings = self.sigmoid(x)
+        #batch_size, num_views, c, h, w = x.size()
+        #x = x.view(batch_size * num_views, c, h, w)  # Reshape to combine batch and views
 
-        # Decoding
+        # Encode views
+        x = self.encoder(x)
+        x = x.view(x.size(0), -1)
+        embeddings = self.fc_encoder(x)
+        embeddings = self.sigmoid(embeddings)
+
+        # Decode views
         x = self.fc_decoder(embeddings)
         x = x.view(-1, 256, 6, 6)
-        x = self.unpool3(x, indices3)
-        x = self.deconv5(x)
-        x = nn.ReLU()(x)
-        x = self.deconv4(x)
-        x = nn.ReLU()(x)
-        x = self.deconv3(x)
-        x = nn.ReLU()(x)
-        x = self.unpool2(x, indices2)
-        x = self.deconv2(x)
-        x = nn.ReLU()(x)
-        x = self.unpool1(x, indices1)
-        x = self.deconv1(x)
-        x = nn.ReLU()(x)
+        x = self.decoder(x)
+        x = self.sigmoid(x)
 
-        return x, embeddings
+        # Reshape back to separate views
+        print(x.size())
+        x = x.view(12, 3, 224, 224)  # Assuming output shape matches input
+
+        # Pooling across views (example: max pooling)
+        output, _ = torch.max(x, 1)
+
+        return output, embeddings
 
 
 def mvcnn(pretrained=False, **kwargs):
