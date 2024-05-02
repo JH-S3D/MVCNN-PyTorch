@@ -5,6 +5,7 @@ from torch.utils.data import DataLoader
 import torchvision.transforms as transforms
 from torchvision.transforms.functional import to_tensor
 from torch.autograd import Variable
+from torch.cuda.amp import GradScaler, autocast
 
 import numpy as np
 import time
@@ -18,54 +19,40 @@ mse_loss = nn.MSELoss()
 
 def train_model(model, dataloaders, device='cuda', num_epochs=25):
     model.to(device)
-    optimizer = optim.Adam(model.parameters(), lr=0.001)  # Using Adam optimizer
-    best_loss = float('inf')  # Initialize the best loss to infinity
+    optimizer = optim.Adam(model.parameters(), lr=0.001)
+    scaler = GradScaler()  # Initialize the gradient scaler for AMP
+    best_loss = float('inf')
 
     for epoch in range(num_epochs):
         print('Epoch {}/{}'.format(epoch + 1, num_epochs))
         print('-' * 10)
 
-        # Each epoch has a training and validation phase
         for phase in ['train', 'test']:
-            if phase == 'train':
-                model.train()  # Set model to training mode
-            else:
-                model.eval()   # Set model to evaluate mode
-
+            model.train() if phase == 'train' else model.eval()
             running_loss = 0.0
+            num_batches = 0
 
-            # Iterate over data.
             for inputs, labels in dataloaders[phase]:
-                inputs = np.stack(inputs, axis=1)
-                inputs = inputs[0]
-
-                inputs = torch.from_numpy(inputs)
-
-                inputs = inputs.cuda(device)
-                inputs.requires_grad = True
-
-                # Zero the parameter gradients
+                inputs = inputs.to(device)  # Assume inputs are already tensors
                 optimizer.zero_grad()
 
-                # Forward
                 with torch.set_grad_enabled(phase == 'train'):
-                    outputs, _ = model(inputs)  # Adjust based on your model's output
-                    #print("Inputs: ", inputs.size())
-                    #print("Outputs: ", outputs.size())
-                    loss = mse_loss(outputs, inputs)
+                    with autocast():  # Using AMP for mixed precision
+                        outputs, _ = model(inputs)
+                        loss = mse_loss(outputs, inputs)
 
-                    # Backward + optimize only if in training phase
                     if phase == 'train':
-                        loss.backward()
-                        optimizer.step()
+                        scaler.scale(loss).backward()  # Scale the loss and call backward
+                        scaler.step(optimizer)  # Optimizer step
+                        scaler.update()  # Update the scaler
+                    else:
+                        running_loss += loss.item()
 
-                # Statistics
-                running_loss += loss# * inputs.size(0)
+                num_batches += 1
 
-            epoch_loss = running_loss / len(dataloaders[phase].dataset)
+            epoch_loss = running_loss / num_batches
             print('{} Loss: {:.4f}'.format(phase, epoch_loss))
 
-            # Check if this is the best loss so far; save model if this is the case
             if phase == 'test' and epoch_loss < best_loss:
                 best_loss = epoch_loss
                 print(f"New best loss {best_loss:.4f} at epoch {epoch+1}. Saving model...")
