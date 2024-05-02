@@ -56,7 +56,7 @@ class MVCNN(nn.Module):
             nn.Upsample(scale_factor=2),  # Further increase size
             
             nn.ConvTranspose2d(64, 3, kernel_size=11, stride=4, padding=2, output_padding=1),
-            nn.ReLU(inplace=True)
+            nn.ReLU(inplace=True),
             nn.Upsample(scale_factor=2),  # Further increase size
         )
 
