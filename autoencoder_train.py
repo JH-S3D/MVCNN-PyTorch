@@ -33,7 +33,15 @@ def train_model(model, dataloaders, device='cuda', num_epochs=25):
             num_batches = 0
 
             for inputs, labels in dataloaders[phase]:
+                inputs = np.stack(inputs, axis=1)
+                inputs = inputs[0]
+
+                inputs = torch.from_numpy(inputs)
+
+                inputs = inputs.cuda(device)
+                inputs.requires_grad = True
                 inputs = inputs.to(device)  # Assume inputs are already tensors
+                
                 optimizer.zero_grad()
 
                 with torch.set_grad_enabled(phase == 'train'):
