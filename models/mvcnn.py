@@ -78,12 +78,12 @@ class MVCNN(nn.Module):
 
         # Reshape back to separate views
         print(x.size())
-        x = x.view(12, 3, 224, 224)  # Assuming output shape matches input
+        #x = x.view(12, 3, 224, 224)  # Assuming output shape matches input
 
         # Pooling across views (example: max pooling)
-        output, _ = torch.max(x, 1)
+        #output, _ = torch.max(x, 1)
 
-        return output, embeddings
+        return x, embeddings
 
 
 def mvcnn(pretrained=False, **kwargs):
