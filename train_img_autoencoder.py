@@ -68,7 +68,7 @@ for epoch in range(25):
         optimizer.step()
 
         epoch_loss+= loss
-        print('-', end= "", flush= True)
+        #print('-', end= "", flush= True)
 
     epoch_loss = epoch_loss/len(dataloaders)
     losses.append(epoch_loss)
