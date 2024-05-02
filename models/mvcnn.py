@@ -57,7 +57,7 @@ class MVCNN(nn.Module):
             
             nn.ConvTranspose2d(64, 3, kernel_size=11, stride=4, padding=2, output_padding=1),
             nn.ReLU(inplace=True),
-            nn.Upsample(scale_factor=1.16),  # Further increase size
+            nn.Upsample(scale_factor=1.15),  # Further increase size
         )
 
     def forward(self, x):
