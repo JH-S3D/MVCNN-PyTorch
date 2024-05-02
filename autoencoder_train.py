@@ -50,6 +50,8 @@ def train_model(model, dataloaders, device='cuda', num_epochs=25):
                 # Forward
                 with torch.set_grad_enabled(phase == 'train'):
                     outputs, _ = model(inputs)  # Adjust based on your model's output
+                    print("Inputs: ", inputs.size())
+                    print("Outputs: ", outputs.size())
                     loss = mse_loss(outputs, inputs)
 
                     # Backward + optimize only if in training phase
