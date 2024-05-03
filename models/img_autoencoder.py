@@ -23,11 +23,11 @@ class ConvAutoencoder(torch.nn.Module):
 
         self.decoder = torch.nn.Sequential(
             torch.nn.Upsample(scale_factor=1, mode='nearest'),
-            torch.nn.Conv2d(4, 16, 3, stride=1, padding=1),  # b, 16, 10, 10
+            torch.nn.Conv2d(4, 16, 3, stride=1, padding=2),  # b, 16, 10, 10
             torch.nn.ReLU(True),
 
             torch.nn.Upsample(scale_factor=1, mode='nearest'),
-            torch.nn.Conv2d(16, 64, 3, stride=1, padding=2),  # b, 16, 10, 10
+            torch.nn.Conv2d(16, 64, 3, stride=1, padding=1),  # b, 16, 10, 10
             torch.nn.ReLU(True),
             torch.nn.Upsample(scale_factor=1, mode='nearest'),
             torch.nn.Conv2d(64, 3, 3, stride=1, padding=1),  # b, 8, 3, 3
