@@ -9,7 +9,7 @@ class ConvAutoencoder(torch.nn.Module):
             torch.nn.Conv2d(3, 64, 3, stride=1, padding=1),  # 
             torch.nn.ReLU(True),
             torch.nn.MaxPool2d(2, stride=1),
-            torch.nn.Conv2d(64, 192, 3, stride=1, padding=1),  # b, 8, 3, 3
+            torch.nn.Conv2d(64, 192, 2, stride=1, padding=2),  # b, 8, 3, 3
             torch.nn.ReLU(True),
             torch.nn.MaxPool2d(2, stride=1),  # b, 8, 2, 2
         )
@@ -19,7 +19,7 @@ class ConvAutoencoder(torch.nn.Module):
 
         self.decoder = torch.nn.Sequential(
             torch.nn.Upsample(scale_factor=1, mode='nearest'),
-            torch.nn.Conv2d(192, 64, 3, stride=1, padding=1),  # b, 16, 10, 10
+            torch.nn.Conv2d(192, 64, 2, stride=1, padding=1),  # b, 16, 10, 10
             torch.nn.ReLU(True),
             torch.nn.Upsample(scale_factor=1, mode='nearest'),
             torch.nn.Conv2d(64, 3, 3, stride=1, padding=1),  # b, 8, 3, 3
