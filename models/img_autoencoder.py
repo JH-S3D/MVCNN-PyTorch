@@ -22,7 +22,7 @@ class ConvAutoencoder(torch.nn.Module):
             torch.nn.Conv2d(16, 64, 3, stride=1, padding=1),  # b, 16, 10, 10
             torch.nn.ReLU(True),
             torch.nn.Upsample(scale_factor=1, mode='nearest'),
-            torch.nn.Conv2d(64, 1, 3, stride=1, padding=2),  # b, 8, 3, 3
+            torch.nn.Conv2d(64, 3, 3, stride=1, padding=2),  # b, 8, 3, 3
             torch.nn.Sigmoid()
         )
 
