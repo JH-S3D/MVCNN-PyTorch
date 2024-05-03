@@ -12,13 +12,13 @@ from custom_dataset import MultiViewDataSet
 
 data_transforms = {
         'train': transforms.Compose([
-            transforms.Grayscale(num_output_channels=1),
+            #transforms.Grayscale(num_output_channels=1),
             transforms.Resize(256),
             transforms.CenterCrop(224),
             transforms.ToTensor(),
         ]),
         'test': transforms.Compose([
-            transforms.Grayscale(num_output_channels=1),
+            #transforms.Grayscale(num_output_channels=1),
             transforms.Resize(256),
             transforms.CenterCrop(224),
             transforms.ToTensor(),
