@@ -6,29 +6,32 @@ class ConvAutoencoder(torch.nn.Module):
         super(ConvAutoencoder, self).__init__()
 
         self.encoder = torch.nn.Sequential(
-            torch.nn.Conv2d(3, 64, 3, stride=1, padding=1),  # 
+            # b, 3, 224, 224
+            torch.nn.Conv2d(3, 64, 3, stride=2, padding=1),  
             torch.nn.ReLU(True),
-            torch.nn.MaxPool2d(2, stride=1),
-            torch.nn.Conv2d(64, 192, 2, stride=1, padding=2),  # b, 8, 3, 3
+            torch.nn.MaxPool2d(2, stride=2),
+            torch.nn.Conv2d(64, 16, 3, stride=1, padding=1),
             torch.nn.ReLU(True),
-            torch.nn.MaxPool2d(2, stride=1),  # b, 8, 2, 2
+            torch.nn.MaxPool2d(2, stride=2)  # b, 16, 28, 28
         )
 
         #self.fc_encoder = nn.Linear(16 * 222 *222, 4096)
         #self.fc_decoder = nn.Linear(4096, 16 * 222 *222)
 
         self.decoder = torch.nn.Sequential(
-            torch.nn.Upsample(scale_factor=1, mode='nearest'),
-            torch.nn.Conv2d(192, 64, 2, stride=1, padding=1),  # b, 16, 10, 10
+            torch.nn.Upsample(scale_factor=2, mode='nearest'),
+            torch.nn.ConvTranspose2d(16, 64, 3, stride=1, padding=1),
             torch.nn.ReLU(True),
-            torch.nn.Upsample(scale_factor=1, mode='nearest'),
-            torch.nn.Conv2d(64, 3, 3, stride=1, padding=1),  # b, 8, 3, 3
+            torch.nn.Upsample(scale_factor=2, mode='nearest'),
+            torch.nn.ConvTranspose2d(64, 3, 3, stride=2, padding=1, output_padding=1),  # b, 3, 223, 223
             torch.nn.Sigmoid()
         )
 
     def forward(self, x):
+        print(x.size())
         x = self.encoder(x)
         print(x.size())
+
         #x = nn.Flatten(x)
         #embedding = self.fc_encoder(x)
 
@@ -36,4 +39,5 @@ class ConvAutoencoder(torch.nn.Module):
         #embedding = embedding.view(1, 16, 222, 222)
 
         x = self.decoder(x)
+        print(x.size())
         return x
