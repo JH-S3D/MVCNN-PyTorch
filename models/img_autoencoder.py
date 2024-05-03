@@ -36,6 +36,7 @@ class ConvAutoencoder(torch.nn.Module):
 
     def forward(self, x):
         x = self.encoder(x)
+        print(x.size())
         #x = nn.Flatten(x)
         #embedding = self.fc_encoder(x)
 
