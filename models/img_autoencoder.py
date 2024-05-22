@@ -28,9 +28,9 @@ class ConvAutoencoder(torch.nn.Module):
         )
 
     def forward(self, x):
-        #print(x.size())
+        print(x.size())
         x = self.encoder(x)
-        #print(x.size())
+        print(x.size())
 
         x = nn.Flatten(x)
         embedding = self.fc_encoder(x)
@@ -39,5 +39,5 @@ class ConvAutoencoder(torch.nn.Module):
         embedding = embedding.view(1, 16, 28, 28)
 
         x = self.decoder(embedding)
-        #print(x.size())
+        print(x.size())
         return x
