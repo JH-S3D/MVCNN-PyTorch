@@ -15,8 +15,8 @@ class ConvAutoencoder(torch.nn.Module):
             torch.nn.MaxPool2d(2, stride=2)  # b, 16, 28, 28
         )
 
-        self.fc_encoder = nn.Linear(16, 28, 28, 4096)
-        self.fc_decoder = nn.Linear(4096, 16, 28, 28)
+        self.fc_encoder = nn.Linear(16 * 28 * 28, 4096)
+        self.fc_decoder = nn.Linear(4096, 16 * 28 * 28)
 
         self.decoder = torch.nn.Sequential(
             torch.nn.Upsample(scale_factor=2, mode='nearest'),
@@ -36,7 +36,7 @@ class ConvAutoencoder(torch.nn.Module):
         embedding = self.fc_encoder(x)
 
         embedding = self.fc_decoder(embedding)
-        embedding = embedding.view(1, 16, 222, 222)
+        embedding = embedding.view(1, 16, 28, 28)
 
         x = self.decoder(embedding)
         #print(x.size())
