@@ -15,6 +15,7 @@ class ConvAutoencoder(torch.nn.Module):
             torch.nn.MaxPool2d(2, stride=2)  # b, 16, 28, 28
         )
 
+        self.flatten = nn.Flatten()
         self.fc_encoder = nn.Linear(16 * 28 * 28, 4096)
         self.fc_decoder = nn.Linear(4096, 16 * 28 * 28)
 
@@ -32,7 +33,7 @@ class ConvAutoencoder(torch.nn.Module):
         x = self.encoder(x)
         print("2", x.size())
 
-        x = nn.Flatten(x)
+        x = self.flatten(x)
         print("3", x.size())
         embedding = self.fc_encoder(x)
         print("4", embedding.size())
