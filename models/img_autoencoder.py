@@ -16,8 +16,8 @@ class ConvAutoencoder(torch.nn.Module):
         )
 
         self.flatten = nn.Flatten()
-        self.fc_encoder = nn.Linear(16 * 28 * 28, 4096)
-        self.fc_decoder = nn.Linear(4096, 16 * 28 * 28)
+        self.fc_encoder = nn.Linear(16 * 28 * 28, 1024)
+        self.fc_decoder = nn.Linear(1024, 16 * 28 * 28)
 
         self.decoder = torch.nn.Sequential(
             torch.nn.Upsample(scale_factor=2, mode='nearest'),
@@ -41,3 +41,12 @@ class ConvAutoencoder(torch.nn.Module):
 
         x = self.decoder(embedding)
         return x
+    
+    def get_embedded_vector(self, x):
+        x = self.encoder(x)
+
+        x = self.flatten(x)
+        embedding = self.fc_encoder(x)
+        embedding = nn.ReLU()(embedding)
+
+        return embedding
