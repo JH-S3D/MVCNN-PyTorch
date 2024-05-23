@@ -52,7 +52,7 @@ print("\nTraining the Convolutional AutoEncoder Model on Training Data...")
 losses = []
 best_loss = float('inf')
 
-for epoch in range(25): 
+for epoch in range(50): 
     epoch_loss = 0
     for X, y in dataloaders['train']:
         img = X[0].to(device)
