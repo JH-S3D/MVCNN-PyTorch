@@ -16,6 +16,7 @@ class ConvAutoencoder(torch.nn.Module):
         )
 
         self.flatten = nn.Flatten()
+        self.sigmoid = nn.Sigmoid()
         self.fc_encoder = nn.Linear(16 * 28 * 28, 1024)
         self.fc_decoder = nn.Linear(1024, 16 * 28 * 28)
 
@@ -33,10 +34,10 @@ class ConvAutoencoder(torch.nn.Module):
 
         x = self.flatten(x)
         embedding = self.fc_encoder(x)
-        embedding = nn.ReLU()(embedding)
+        embedding = self.sigmoid(embedding)
 
         embedding = self.fc_decoder(embedding)
-        embedding = nn.ReLU()(embedding)
+        embedding = self.sigmoid(embedding)
         embedding = embedding.view(1, 16, 28, 28)
 
         x = self.decoder(embedding)
@@ -47,6 +48,6 @@ class ConvAutoencoder(torch.nn.Module):
 
         x = self.flatten(x)
         embedding = self.fc_encoder(x)
-        embedding = nn.ReLU()(embedding)
+        embedding = self.sigmoid(embedding)
 
         return embedding
