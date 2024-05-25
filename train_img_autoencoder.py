@@ -36,6 +36,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # defining the model
 convAE_model = ConvAutoencoder().to(device)
+convAE_model.load_state_dict(torch.load("/home/user/repo/testingRepo/MVCNN-PyTorch/model_16.pth"))
 
 # defining the optimizer
 optimizer = torch.optim.Adam(convAE_model.parameters(), lr= 0.001)
